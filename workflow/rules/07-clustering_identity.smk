@@ -30,7 +30,7 @@ rule cluster_ID:
             --cluster_fast {input} \
             --id {params.id} \
             --threads {threads} \
-            --relabel OTU_ \
+            --relabel_sha1 \
             --sizeout \
             --otutabout {output.otu_table} \
             --centroids {output.otu_centroids}
