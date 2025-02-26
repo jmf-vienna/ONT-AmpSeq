@@ -69,3 +69,58 @@ rule relabel_merge:
         echo "Finished concatenation of relabeled OTUs"
         }} > {log} 2>&1
         """
+
+
+rule relabel_filtered:
+    input:
+        os.path.join(config["tmp_dir"], "samples", "{sample}_filtered.fasta"),
+    output:
+        os.path.join(config["tmp_dir"], "samples", "{sample}_filtered_relabeled.fasta"),
+    conda:
+        "../envs/vsearch.yml"
+    threads: 1
+    resources:
+        mem_mb=2048,
+        runtime=60,
+    log:
+        os.path.join(config["log_dir"], "06-relabel", "relabel_filtered", "{sample}.log"),
+    shell:
+        """
+        {{
+        vsearch \
+            --sortbysize {input} \
+            --sample {wildcards.sample} \
+            --threads {threads} \
+            --output {output}
+        }} > {log} 2>&1
+        """
+
+
+rule relabel_filtered_merge:
+    input:
+        expand(
+            os.path.join(config["tmp_dir"], "samples", "{sample}_filtered_relabeled.fasta"),
+            sample=get_samples(),
+        ),
+    output:
+        os.path.join(config["output_dir"], "merged_filtered_relabeled.fasta"),
+    threads: 1
+    resources:
+        mem_mb=512,
+        runtime=60,
+    conda:
+        "../envs/vsearch.yml"
+    log:
+        os.path.join(
+            config["log_dir"],
+            "06-relabel_filtered",
+            "merged_filtered_relabeled.log",
+        ),
+    shell:
+        """
+        {{
+        echo "Starting concatenation of relabeled OTUs"
+        cat {input} > {output}
+        echo "Finished concatenation of relabeled OTUs"
+        }} > {log} 2>&1
+        """

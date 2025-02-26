@@ -13,6 +13,8 @@ rule cluster_ID:
         otu_centroids=os.path.join(
             config["output_dir"], "cluster", "{id}", "otu_{id}.fa"
         ),
+    wildcard_constraints:
+        id="97|99",
     threads: config["max_threads"]
     resources:
         mem_mb=2048,
@@ -61,6 +63,39 @@ rule cluster_unoise:
         "../envs/vsearch.yml"
     log:
         os.path.join(config["log_dir"], "07-clustering_identity", "otu_unoise.log"),
+    shell:
+        """
+        {{
+        vsearch \
+            --cluster_unoise {input} \
+            --minsize 1 \
+            --threads {threads} \
+            --relabel_sha1 \
+            --sizeout \
+            --otutabout {output.otu_table} \
+            --centroids {output.otu_centroids}
+        }} > {log} 2>&1
+        """
+
+
+rule cluster_unoise_unpolished:
+    input:
+        os.path.join(config["output_dir"], "merged_filtered_relabeled.fasta"),
+    output:
+        otu_table=os.path.join(
+            config["output_dir"], "cluster", "unoise_unpolished", "otu_cluster_unoise_unpolished.tsv"
+        ),
+        otu_centroids=os.path.join(
+            config["output_dir"], "cluster", "unoise_unpolished", "otu_unoise_unpolished.fa"
+        ),
+    threads: config["max_threads"]
+    resources:
+        mem_mb=2048,
+        runtime=1440,
+    conda:
+        "../envs/vsearch.yml"
+    log:
+        os.path.join(config["log_dir"], "07-clustering_identity", "otu_unoise_unpolished.log"),
     shell:
         """
         {{
