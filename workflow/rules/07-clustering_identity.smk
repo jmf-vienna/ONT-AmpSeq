@@ -27,7 +27,7 @@ rule cluster_ID:
         """
         {{
         vsearch \
-            --cluster_fast {input} \
+            --cluster_size {input} \
             --id {params.id} \
             --threads {threads} \
             --relabel_sha1 \
