@@ -126,6 +126,7 @@ if __name__ == "__main__":
 def prepare_inputs():
     inputs = []
     ids = config["ids"]
+    ids.append("unoise")
     if config["include_sintax_output"]:
         inputs.extend(
             expand(
