@@ -128,6 +128,7 @@ def prepare_inputs():
     ids = config["ids"]
     ids.append("unoise")
     ids.append("unoise_unpolished")
+    ids.append("97_unpolished")
     if config["include_sintax_output"]:
         inputs.extend(
             expand(

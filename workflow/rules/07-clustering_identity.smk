@@ -78,6 +78,43 @@ rule cluster_unoise:
         """
 
 
+rule cluster_ID_unpolished:
+    input:
+        os.path.join(config["output_dir"], "merged_filtered_relabeled.fasta"),
+    output:
+        otu_table=os.path.join(
+            config["output_dir"], "cluster", "{id}_unpolished", "otu_cluster_{id}_unpolished.tsv"
+        ),
+        otu_centroids=os.path.join(
+            config["output_dir"], "cluster", "{id}_unpolished", "otu_{id}_unpolished.fa"
+        ),
+    wildcard_constraints:
+        id="97|99",
+    threads: config["max_threads"]
+    resources:
+        mem_mb=2048,
+        runtime=1440,
+    conda:
+        "../envs/vsearch.yml"
+    log:
+        os.path.join(config["log_dir"], "07-clustering_identity", "otu_{id}_unpolished.log"),
+    params:
+        id=lambda wildcards: float(wildcards.id) / 100,
+    shell:
+        """
+        {{
+        vsearch \
+            --cluster_size {input} \
+            --id {params.id} \
+            --threads {threads} \
+            --relabel_sha1 \
+            --sizeout \
+            --otutabout {output.otu_table} \
+            --centroids {output.otu_centroids}
+        }} > {log} 2>&1
+        """
+
+
 rule cluster_unoise_unpolished:
     input:
         os.path.join(config["output_dir"], "merged_filtered_relabeled.fasta"),
